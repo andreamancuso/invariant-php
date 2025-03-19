@@ -32,3 +32,38 @@ class BankAccount {
         }
     }
 }
+
+### Development commands
+
+- `phpize`
+- `./configure`
+- `make -j$(nproc)`
+
+To recompile
+
+`make clean && make -j$(nproc)`
+
+### Development links
+
+- https://www.phpinternalsbook.com/php7/extensions_design/zend_extensions.html
+
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include/php", // Add the path to the PHP headers
+                "/usr/include/php/main",
+                "/usr/include/php/Zend",
+                "/usr/include/php/TSRM"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

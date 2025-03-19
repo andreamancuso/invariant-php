@@ -1,0 +1,43 @@
+# Ignore compiled objects and binaries
+modules/
+*.lo
+*.o
+*.la
+*.a
+*.libs
+*.so
+
+# Ignore build files
+Makefile
+Makefile.global
+Makefile.objects
+config.h
+config.nice
+config.status
+config.sub
+config.guess
+configure
+configure.ac
+ltmain.sh
+aclocal.m4
+config.log
+libtool
+Makefile.fragments
+autom4te.cache/
+
+*.dep
+config.h.in
+build/
+
+# Ignore PHP build artifacts
+*.gcno
+*.gcda
+*.dirstamp
+*.deps/
+*.stamp
+
+# Ignore editor and OS-specific files
+.DS_Store
+.idea/
+.vscode/
+*.swp
