@@ -1,4 +1,4 @@
-# **Invariant PHP**
+# Invariant PHP
 
 **Invariant PHP** is a native PHP extension that brings [Design by Contract (DbC)](https://en.wikipedia.org/wiki/Design_by_contract) principles to PHP. It **automatically enforces class invariants** _and ensures all typed properties are initialized_ without relying on reflection.
 
@@ -45,7 +45,7 @@ $account->withdraw(50); // ✅ Works fine
 $account->withdraw(100); // ❌ Fatal error or LogicException if below zero
 ```
 
-## **📦 Installation**
+## Installation
 
 Currently, you must **build from source**:
 ```sh
@@ -59,19 +59,19 @@ Then enable it in `php.ini`:
 extension=invariant_php.so
 ```
 
-## **🛠 How It Works**
+## **How It Works**
 
 - **Hooks the Zend Engine** by overriding `zend_execute_ex`.
 - **Checks typed properties** for initialization before calling `__invariant()`.
 - **Throws a fatal error** if any typed property is uninitialized.
 - **Automatically calls `__invariant()`** before & after each method execution.
 
-## **⚡ Roadmap**
+## **Roadmap**
 
-- 🔄 **Support `requires()` (preconditions)**.
-- 🔄 **Support `ensures()` (postconditions)**.
-- 📈 **Optimization & caching** for better performance.
-- 📦 **PECL package for easy installation**.
+- **Support `requires()` (preconditions)**.
+- **Support `ensures()` (postconditions)**.
+- **Optimization & caching** for better performance.
+- **PECL package for easy installation**.
 
 ---
 
