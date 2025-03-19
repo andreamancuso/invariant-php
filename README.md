@@ -45,6 +45,16 @@ $account->withdraw(50); // ✅ Works fine
 $account->withdraw(100); // ❌ Fatal error or LogicException if below zero
 ```
 
+## Limitations
+
+Right now, Invariant PHP doesn’t explicitly detect or prevent invariant loops, so if an `__invariant()` method calls another method that triggers `__invariant()` again, it could lead to unintended recursion.
+
+I plan to address this by:
+
+- Tracking active invariant checks per object to detect re-entrant calls.
+- Throwing an error or skipping nested invariant checks when recursion is detected.
+- Ensuring performance remains unaffected in non-recursive cases.
+
 ## Installation
 
 Currently, you must **build from source**:
