@@ -2,6 +2,10 @@
 
 **Invariant PHP** is a native PHP extension that brings **Design by Contract (DbC)** principles to PHP. It **automatically enforces class invariants** _and ensures all typed properties are initialized_ without relying on slow runtime reflection.
 
+## License
+
+Released under the [PHP License 3.01](https://www.php.net/license/3_01.txt).
+
 ## **🔥 Features**
 
 ✅ **Class Invariants (`__invariant()`)** – Ensures an object's state remains valid **before and after** each method call.

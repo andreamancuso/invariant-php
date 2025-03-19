@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package xmlns="http://pear.php.net/dtd/package-2.0" version="2.0">
+  <name>invariant_php</name>
+  <channel>pecl.php.net</channel>
+  <summary>Design by Contract extension for PHP</summary>
+  <description>Invariant PHP is a native extension that enforces class invariants...</description>
+  
+  <lead>
+    <name>Andrea Mancuso</name>
+    <user>andreamancuso</user>
+    <email>and.mancuso@googlemail.com</email>
+    <active>yes</active>
+  </lead>
+
+  <date>2025-03-19</date>
+  <version>
+    <release>0.1.0</release>
+    <api>0.1.0</api>
+  </version>
+  <stability>
+    <release>beta</release>
+    <api>beta</api>
+  </stability>
+
+  <!-- Reference the PHP License -->
+  <license uri="https://www.php.net/license/3_01.txt">PHP License 3.01</license>
+
+  <php>
+    <min>8.4.0</min>
+  </php>
+
+  <extsrcrelease>
+    <configureoptions>
+      <configureoption name="enable-invariant_php" prompt="Enable Invariant PHP?" />
+    </configureoptions>
+  </extsrcrelease>
+</package>
