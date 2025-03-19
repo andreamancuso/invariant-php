@@ -14,6 +14,8 @@ PHP lacks **built-in support for contracts** like Eiffel. Existing solutions (li
 
 ## **📌 Example Usage**  
 ```php
+<?php
+
 class BankAccount {
     private int $balance;
 
