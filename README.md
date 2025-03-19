@@ -1,23 +1,23 @@
-# **Invariant PHP** 🚀
+# **Invariant PHP**
 
-**Invariant PHP** is a native PHP extension that brings **Design by Contract (DbC)** principles to PHP. It **automatically enforces class invariants** _and ensures all typed properties are initialized_ without relying on slow runtime reflection.
+**Invariant PHP** is a native PHP extension that brings [Design by Contract (DbC)](https://en.wikipedia.org/wiki/Design_by_contract) principles to PHP. It **automatically enforces class invariants** _and ensures all typed properties are initialized_ without relying on reflection.
 
 ## License
 
 Released under the [PHP License 3.01](https://www.php.net/license/3_01.txt).
 
-## **🔥 Features**
+## Features
 
-✅ **Class Invariants (`__invariant()`)** – Ensures an object's state remains valid **before and after** each method call.
-✅ **Enforced Initialization** – Detects **uninitialized typed properties** and raises a **fatal error** before `__invariant()` runs.
-✅ **Native PHP Extension** – Written in C for **maximum performance**, avoiding overhead from reflection or AOP.
-✅ **Transparent Execution** – Works automatically on all class methods **without** modifying user code.
+- **Class Invariants (`__invariant()`)** – Ensures an object's state remains valid **before and after** each method call.
+- **Enforced Initialization** – Detects **uninitialized typed properties** and raises a **fatal error** before `__invariant()` runs.
+- **Native PHP Extension** – Written in C, avoiding overhead from reflection or AOP.
+- **Transparent Execution** – Just define `__invariant()` and you are good to go.
 
-## **🚀 Why?**
+## Why?
 
-PHP lacks built-in support for **Design by Contract**. Existing solutions (like PHPDeal) rely on **runtime reflection** or **AOP hacks**, which can be slow or brittle. **Invariant PHP** is a **native extension** that makes contract checks **fast** and **reliable**, hooking directly into the **Zend Engine**.
+PHP lacks built-in support for **Design by Contract**. Existing solutions (like PHPDeal) rely on **runtime reflection** or **AOP hacks**, which can be slow or brittle. **Invariant PHP** hooks directly into the **Zend Engine**.
 
-## **📌 Example Usage**
+## Example Usage
 ```php
 <?php
 
