@@ -39,10 +39,6 @@ static void call_invariant_if_exists(zend_object *obj) {
 static void invariant_execute_ex(zend_execute_data *execute_data) {
     const zend_op_array *op_array = &execute_data->func->op_array;
     
-    if (op_array && op_array->function_name) {
-        php_printf("Executing: %s\n", ZSTR_VAL(op_array->function_name));
-    }
-    
     if (execute_data->func->op_array.scope && Z_TYPE(execute_data->This) == IS_OBJECT) { // Check if it's a class method and an object
         zend_object *obj = Z_OBJ(execute_data->This);
         call_invariant_if_exists(obj); // Call __invariant() before execution
