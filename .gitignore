@@ -29,6 +29,7 @@ autom4te.cache/
 *.dep
 config.h.in
 build/
+dist/
 
 # Ignore PHP build artifacts
 *.gcno

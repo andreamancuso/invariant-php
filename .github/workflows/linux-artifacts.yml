@@ -1,0 +1,99 @@
+name: Linux Artifacts
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - "v*"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: PHP ${{ matrix.php }} ${{ matrix.libc.name }} ${{ matrix.arch.name }}
+    runs-on: ${{ matrix.arch.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        php:
+          - "8.3"
+          - "8.4"
+        libc:
+          - name: glibc
+            php_variant: cli
+          - name: musl
+            php_variant: cli-alpine
+        arch:
+          - name: x86_64
+            docker_platform: amd64
+            runner: ubuntu-latest
+          - name: arm64
+            docker_platform: arm64
+            runner: ubuntu-24.04-arm
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and export extension
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          artifact="invariant_php-php${{ matrix.php }}-linux-${{ matrix.arch.name }}_${{ matrix.libc.name }}-nts.so"
+          output_dir="dist/${artifact%.so}"
+
+          docker buildx build \
+            --platform "linux/${{ matrix.arch.docker_platform }}" \
+            --build-arg "PHP_VERSION=${{ matrix.php }}" \
+            --build-arg "PHP_VARIANT=${{ matrix.libc.php_variant }}" \
+            --target artifact \
+            --output "type=local,dest=${output_dir}" \
+            .
+
+          mv "${output_dir}/invariant_php.so" "dist/${artifact}"
+          rmdir "${output_dir}"
+          file "dist/${artifact}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: invariant_php-php${{ matrix.php }}-linux-${{ matrix.arch.name }}_${{ matrix.libc.name }}-nts
+          path: dist/*.so
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish GitHub release assets
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/*.so --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/*.so --title "$GITHUB_REF_NAME" --generate-notes
+          fi

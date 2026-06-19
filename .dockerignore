@@ -2,6 +2,7 @@
 .libs/
 autom4te.cache/
 build/
+dist/
 modules/
 
 Makefile
