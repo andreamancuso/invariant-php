@@ -17,13 +17,15 @@ class BankAccount {
         }
     }
 
-    public function withdraw(int $amount) {
-        $this->balance -= $amount;
+    public function noop() {
+        echo "noop\n";
     }
 }
 
-$account = new BankAccount(-100);
-$account->withdraw(50);
+$account = new BankAccount();
+$account->noop();
 ?>
 --EXPECTF--
+noop
+
 Fatal error: Invariant check failed: Uninitialized property 'balance' in class 'BankAccount' in %s on line %d

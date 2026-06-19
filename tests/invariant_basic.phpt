@@ -18,6 +18,5 @@ $obj = new Example();
 $obj->doSomething();
 ?>
 --EXPECT--
-Invariant check executed!
 Doing something...
 Invariant check executed!

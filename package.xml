@@ -12,9 +12,9 @@
     <active>yes</active>
   </lead>
 
-  <date>2025-03-19</date>
+  <date>2026-06-19</date>
   <version>
-    <release>0.1.0</release>
+    <release>0.1.1</release>
     <api>0.1.0</api>
   </version>
   <stability>

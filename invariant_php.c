@@ -8,6 +8,8 @@ static void (*original_zend_execute_ex)(zend_execute_data *execute_data);
 // Forward declarations
 static void invariant_execute_ex(zend_execute_data *execute_data);
 static void call_invariant_if_exists(zend_object *obj);
+static zend_bool is_invariant_boundary_call(zend_execute_data *execute_data);
+static zend_bool has_active_boundary_call_for_object(zend_execute_data *execute_data, zend_object *obj);
 
 ///////////////////////////////////////////////////////////////////
 // call_invariant_if_exists
@@ -64,9 +66,12 @@ static void call_invariant_if_exists(zend_object *obj)
     zend_function *invariant_fn = zend_hash_str_find_ptr(
         &ce->function_table, "__invariant", sizeof("__invariant") - 1);
 
-    if (invariant_fn) {
+    if (invariant_fn
+        && (invariant_fn->common.fn_flags & ZEND_ACC_PUBLIC)
+        && !(invariant_fn->common.fn_flags & ZEND_ACC_STATIC)) {
         zval retval;
         zval obj_zval, function_name;
+        ZVAL_UNDEF(&retval);
         ZVAL_OBJ(&obj_zval, obj);
         ZVAL_STRING(&function_name, "__invariant");
 
@@ -77,8 +82,8 @@ static void call_invariant_if_exists(zend_object *obj)
                                &obj_zval,
                                &function_name,
                                &retval,
-                               0, NULL) == SUCCESS)
-        {
+                               0, NULL) == SUCCESS
+            && !Z_ISUNDEF(retval)) {
             zval_ptr_dtor(&retval);
         }
 
@@ -89,27 +94,84 @@ static void call_invariant_if_exists(zend_object *obj)
 }
 
 ///////////////////////////////////////////////////////////////////
+// boundary call detection
+//
+// Detects public method boundaries and skips nested same-object public
+// calls by inspecting earlier frames on the Zend call stack.
+///////////////////////////////////////////////////////////////////
+static zend_bool is_invariant_boundary_call(zend_execute_data *execute_data)
+{
+    if (!execute_data || !execute_data->func) {
+        return 0;
+    }
+
+    zend_function *func = execute_data->func;
+
+    if (func->type != ZEND_USER_FUNCTION) {
+        return 0;
+    }
+
+    if (!func->op_array.scope || Z_TYPE(execute_data->This) != IS_OBJECT) {
+        return 0;
+    }
+
+    if (!(func->common.fn_flags & ZEND_ACC_PUBLIC)) {
+        return 0;
+    }
+
+    if (!func->common.function_name) {
+        return 0;
+    }
+
+    // Undefined method calls also expose the missing-method frame; skip
+    // the __call() implementation frame to avoid duplicate checks.
+    if (zend_string_equals_literal_ci(func->common.function_name, "__call")
+        || zend_string_equals_literal_ci(func->common.function_name, "__invariant")
+        || zend_string_equals_literal_ci(func->common.function_name, "__destruct")) {
+        return 0;
+    }
+
+    return 1;
+}
+
+static zend_bool has_active_boundary_call_for_object(zend_execute_data *execute_data, zend_object *obj)
+{
+    if (!execute_data || !obj) {
+        return 0;
+    }
+
+    zend_execute_data *frame = execute_data->prev_execute_data;
+    while (frame) {
+        if (is_invariant_boundary_call(frame) && Z_OBJ(frame->This) == obj) {
+            return 1;
+        }
+
+        frame = frame->prev_execute_data;
+    }
+
+    return 0;
+}
+
+///////////////////////////////////////////////////////////////////
 // invariant_execute_ex
 //
-// Hooks zend_execute_ex. Before/after calling a method, we check invariants.
+// Hooks zend_execute_ex. After the outermost successful public method
+// call for an object, we check invariants.
 ///////////////////////////////////////////////////////////////////
 static void invariant_execute_ex(zend_execute_data *execute_data)
 {
-    // Before execution: check invariants if method call
-    if (execute_data->func->op_array.scope && Z_TYPE(execute_data->This) == IS_OBJECT) {
-        zend_object *obj = Z_OBJ(execute_data->This);
-        zend_class_entry *ce = obj->ce;
+    zend_object *obj = NULL;
+    zend_bool should_check_after_call = 0;
 
-        call_invariant_if_exists(obj);
+    if (is_invariant_boundary_call(execute_data)) {
+        obj = Z_OBJ(execute_data->This);
+        should_check_after_call = !has_active_boundary_call_for_object(execute_data, obj);
     }
 
     // Execute the real function
     original_zend_execute_ex(execute_data);
 
-    // After execution: check invariants again if method call
-    if (execute_data->func->op_array.scope && Z_TYPE(execute_data->This) == IS_OBJECT) {
-        zend_object *obj = Z_OBJ(execute_data->This);
-
+    if (should_check_after_call && !EG(exception)) {
         call_invariant_if_exists(obj);
     }
 }
@@ -145,7 +207,7 @@ zend_module_entry invariant_php_module_entry = {
     NULL,                       // RINIT
     NULL,                       // RSHUTDOWN
     NULL,                       // MINFO
-    "0.1",                     // Version
+    "0.1.1",                   // Version
     STANDARD_MODULE_PROPERTIES
 };
 
