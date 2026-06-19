@@ -3,10 +3,23 @@
 - `phpize`
 - `./configure`
 - `make -j$(nproc)`
+- `make test TESTS='-q tests'`
 
 **Recompilation:**
 
 - `make clean && make -j$(nproc)`
+
+### Docker Development
+
+Use Docker when local PHP extension tooling is not installed:
+
+- `docker build -t invariant-php-dev .`
+- `docker run --rm invariant-php-dev`
+
+Or with Docker Compose:
+
+- `docker compose build`
+- `docker compose run --rm test`
 
 ### Development Links
 

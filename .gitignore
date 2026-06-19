@@ -18,6 +18,7 @@ config.sub
 config.guess
 configure
 configure.ac
+run-tests.php
 ltmain.sh
 aclocal.m4
 config.log
