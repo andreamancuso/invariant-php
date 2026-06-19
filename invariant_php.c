@@ -1,7 +1,10 @@
 #include "php.h"
 #include "zend_object_handlers.h" // for OBJ_PROP()
 #include "zend_compile.h"  // for zend_unmangle_property_name()
+#include "ext/standard/info.h"
 #include "ext/standard/php_var.h"
+
+#define PHP_INVARIANT_PHP_VERSION "0.1.1"
 
 static void (*original_zend_execute_ex)(zend_execute_data *execute_data);
 
@@ -181,6 +184,8 @@ static void invariant_execute_ex(zend_execute_data *execute_data)
 ///////////////////////////////////////////////////////////////////
 PHP_MINIT_FUNCTION(invariant_php)
 {
+    REGISTER_STRING_CONSTANT("Invariant\\VERSION", PHP_INVARIANT_PHP_VERSION, CONST_PERSISTENT);
+
     // Hook our custom zend_execute_ex
     original_zend_execute_ex = zend_execute_ex;
     zend_execute_ex = invariant_execute_ex;
@@ -195,6 +200,16 @@ PHP_MSHUTDOWN_FUNCTION(invariant_php)
     return SUCCESS;
 }
 
+PHP_MINFO_FUNCTION(invariant_php)
+{
+    php_info_print_table_start();
+    php_info_print_table_header(2, "invariant_php support", "enabled");
+    php_info_print_table_row(2, "Version", PHP_INVARIANT_PHP_VERSION);
+    php_info_print_table_row(2, "Invariant checks", "after successful outermost public object method calls");
+    php_info_print_table_row(2, "Typed property initialization checks", "enabled");
+    php_info_print_table_end();
+}
+
 ///////////////////////////////////////////////////////////////////
 // Module entry
 ///////////////////////////////////////////////////////////////////
@@ -206,8 +221,8 @@ zend_module_entry invariant_php_module_entry = {
     PHP_MSHUTDOWN(invariant_php),// MSHUTDOWN
     NULL,                       // RINIT
     NULL,                       // RSHUTDOWN
-    NULL,                       // MINFO
-    "0.1.1",                   // Version
+    PHP_MINFO(invariant_php),   // MINFO
+    PHP_INVARIANT_PHP_VERSION,  // Version
     STANDARD_MODULE_PROPERTIES
 };
 
