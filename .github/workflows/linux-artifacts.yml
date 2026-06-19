@@ -2,12 +2,8 @@ name: Linux Artifacts
 
 on:
   push:
-    branches:
-      - main
-      - master
     tags:
       - "v*"
-  pull_request:
   workflow_dispatch:
 
 permissions:
